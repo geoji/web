@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Study Location</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/md5.min.js"></script>
+</head>
+
+<body>
+    <h1>GCS Study Location</h1>
+    <label for="streamid">Stream ID:</label>
+    <input type="text" id="streamid" required>
+
+    <label for="siuid">StudyInstanceUID:</label>
+    <input type="text" id="siuid" required minlength="3" size="64">
+
+    <button type="button" id="generate">Generate</button>
+
+    <p>
+        <a href="" id="studylocation" target="_blank"></a>
+    </p>
+
+    <script>
+        const gcsbrowser = "https://console.cloud.google.com/storage/browser/";
+        // medstrat-joints-00861/e1e4db-1.2.392.200036.9125.2.249636149194221.64991665684.7756211
+        const studyView = ";tab=objects?pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))&project=medstrat-joints-prod&prefix=&forceOnObjectsSortingFiltering=false";
+        document.getElementById("generate").onclick = function generateLocation() {
+
+            var streamid = document.getElementById("streamid").value;
+            streamid = streamid.padStart(5, "0");
+            var siuid = document.getElementById("siuid").value;
+
+            var hash = CryptoJS.MD5(siuid).toString();
+            var prefix = hash.substring(0, 6);
+            var studyPath = "medstrat-joints-" + streamid + "/" + prefix + "-" + siuid;
+            var location = gcsbrowser + studyPath + studyView;
+            var studyLocationElement = document.getElementById("studylocation");
+            studyLocationElement.setAttribute("href", location);
+            studyLocationElement.innerHTML = studyPath;
+        }
+    </script>
+</body>
+
+</html>
